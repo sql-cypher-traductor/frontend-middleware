@@ -70,7 +70,7 @@ export function ConnectionModal({ isOpen, onClose, connection, onSuccess }: Conn
         port: connection.port,
         db_user: connection.db_user,
         db_password: '', // No cargar la contraseña por seguridad
-        database: '',
+        database_name: '',
       })
       setSelectedDbType(connection.db_type)
     } else if (isOpen) {

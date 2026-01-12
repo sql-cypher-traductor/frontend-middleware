@@ -78,6 +78,7 @@ export interface Connection {
   port: number
   db_user: string
   db_password?: string // No se devuelve en GET por seguridad
+  database_name?: string // Para SQL Server
   created_at: string
   updated_at?: string
   is_active?: boolean // Estado de la última prueba de conexión
