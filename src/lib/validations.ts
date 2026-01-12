@@ -1,43 +1,58 @@
 import { z } from 'zod'
 
-// Validación de contraseña segura
+// Validación de contraseña segura según criterios de aceptación
+// Mínimo 8 caracteres, mayúsculas, minúsculas, números y símbolos
 const passwordSchema = z
   .string()
   .min(8, 'La contraseña debe tener al menos 8 caracteres')
-  .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-  .regex(/[a-z]/, 'Debe contener al menos una minúscula')
+  .max(72, 'La contraseña no puede exceder 72 caracteres')
+  .regex(/[A-Z]/, 'Debe contener al menos una letra mayúscula')
+  .regex(/[a-z]/, 'Debe contener al menos una letra minúscula')
   .regex(/[0-9]/, 'Debe contener al menos un número')
-  .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un carácter especial')
+  .regex(/[!@#$%^&*(),.?":{}|<>+=\-_\[\]~`;/\\]/, 'Debe contener al menos un símbolo especial')
 
-// Schema de registro
+// Schema de registro - HU AUM-01 T01
+// Campos: nombre, apellido, email, contraseña y confirmación
 export const registerSchema = z
   .object({
-    email: z.string().email('Email inválido'),
-    username: z
+    name: z
       .string()
-      .min(3, 'El nombre de usuario debe tener al menos 3 caracteres')
-      .max(50, 'El nombre de usuario no puede exceder 50 caracteres'),
+      .min(1, 'El nombre es requerido')
+      .max(100, 'El nombre no puede exceder 100 caracteres')
+      .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, 'El nombre solo puede contener letras'),
+    last_name: z
+      .string()
+      .min(1, 'El apellido es requerido')
+      .max(100, 'El apellido no puede exceder 100 caracteres')
+      .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, 'El apellido solo puede contener letras'),
+    email: z.string().min(1, 'El email es requerido').email('Ingresa un email válido'),
     password: passwordSchema,
-    confirmPassword: z.string(),
+    confirmPassword: z.string().min(1, 'Confirma tu contraseña'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Las contraseñas no coinciden',
     path: ['confirmPassword'],
   })
 
-// Schema de login
+// Schema de login - HU AUM-01 T02
 export const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
+  email: z.string().min(1, 'El email es requerido').email('Ingresa un email válido'),
   password: z.string().min(1, 'La contraseña es requerida'),
 })
 
 // Schema de actualización de perfil
 export const updateProfileSchema = z.object({
-  email: z.string().email('Email inválido'),
-  username: z
+  name: z
     .string()
-    .min(3, 'El nombre de usuario debe tener al menos 3 caracteres')
-    .max(50, 'El nombre de usuario no puede exceder 50 caracteres'),
+    .min(1, 'El nombre es requerido')
+    .max(100, 'El nombre no puede exceder 100 caracteres')
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, 'El nombre solo puede contener letras'),
+  last_name: z
+    .string()
+    .min(1, 'El apellido es requerido')
+    .max(100, 'El apellido no puede exceder 100 caracteres')
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, 'El apellido solo puede contener letras'),
+  email: z.string().email('Email inválido'),
 })
 
 // Schema de cambio de contraseña
