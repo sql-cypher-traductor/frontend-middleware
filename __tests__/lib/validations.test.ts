@@ -1,13 +1,12 @@
-import { describe, test, expect } from 'vitest'
-import { z } from 'zod'
 import {
-  registerSchema,
-  loginSchema,
-  updateProfileSchema,
   changePasswordSchema,
   forgotPasswordSchema,
+  loginSchema,
+  registerSchema,
   resetPasswordSchema,
+  updateProfileSchema,
 } from '@/lib/validations'
+import { describe, expect, test } from 'vitest'
 
 describe('Validation Schemas', () => {
   describe('registerSchema', () => {

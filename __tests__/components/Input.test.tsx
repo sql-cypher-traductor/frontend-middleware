@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
-import { expect, test, describe } from 'vitest'
 import { Input } from '@/components/ui/Input'
+import { render, screen } from '@testing-library/react'
+import { describe, expect, test } from 'vitest'
 
 describe('Input Component', () => {
   test('renders input with label', () => {

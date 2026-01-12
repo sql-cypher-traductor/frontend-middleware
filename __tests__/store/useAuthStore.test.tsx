@@ -1,7 +1,7 @@
-import { renderHook } from '@testing-library/react'
-import { expect, test, describe, beforeEach, vi } from 'vitest'
-import { useAuthStore } from '@/store/useAuthStore'
 import type { User } from '@/lib/api-types'
+import { useAuthStore } from '@/store/useAuthStore'
+import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, test } from 'vitest'
 
 describe('useAuthStore', () => {
   beforeEach(() => {

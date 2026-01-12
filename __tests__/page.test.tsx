@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
-import { expect, test, describe } from 'vitest'
 import HomePage from '@/app/page'
+import { render, screen } from '@testing-library/react'
+import { describe, expect, test } from 'vitest'
 
 describe('Home Page', () => {
   test('renders landing page title', () => {
