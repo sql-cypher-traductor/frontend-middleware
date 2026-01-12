@@ -101,8 +101,8 @@ const baseConnectionSchema = z.object({
     .min(1, 'El host es requerido')
     .max(255, 'El host no puede exceder 255 caracteres')
     .regex(
-      /^[a-zA-Z0-9.:/-]+$/,
-      'El host solo puede contener letras, números, puntos, guiones, dos puntos y barras'
+      /^[a-zA-Z0-9.:/_-]+$/,
+      'El host solo puede contener letras, números, puntos, guiones, guiones bajos, dos puntos y barras'
     ),
   port: z
     .number()
@@ -117,15 +117,26 @@ const baseConnectionSchema = z.object({
     .string()
     .min(1, 'La contraseña es requerida')
     .max(255, 'La contraseña no puede exceder 255 caracteres'),
-})
-
-// Schema para crear conexión (incluye campo database_name para SQL Server)
-export const createConnectionSchema = baseConnectionSchema.extend({
   database_name: z
     .string()
     .max(100, 'El nombre de la base de datos no puede exceder 100 caracteres')
     .optional(),
 })
+
+// Schema para crear conexión con validación condicional de database_name
+export const createConnectionSchema = baseConnectionSchema.refine(
+  (data) => {
+    // Si es SQL Server, database_name es requerido
+    if (data.db_type === 'sql_server') {
+      return data.database_name && data.database_name.trim().length > 0
+    }
+    return true
+  },
+  {
+    message: 'El nombre de la base de datos es requerido para SQL Server',
+    path: ['database_name'],
+  }
+)
 
 // Schema para actualizar conexión (todos los campos opcionales excepto conn_name)
 export const updateConnectionSchema = z.object({
@@ -176,8 +187,8 @@ export const testConnectionSchema = z.object({
     .min(1, 'El host es requerido')
     .max(255, 'El host no puede exceder 255 caracteres')
     .regex(
-      /^[a-zA-Z0-9.:/-]+$/,
-      'El host solo puede contener letras, números, puntos, guiones, dos puntos y barras'
+      /^[a-zA-Z0-9.:/_-]+$/,
+      'El host solo puede contener letras, números, puntos, guiones, guiones bajos, dos puntos y barras'
     ),
   port: z
     .number()

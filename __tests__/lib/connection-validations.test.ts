@@ -5,7 +5,7 @@ import {
 } from '@/lib/validations'
 import { describe, expect, test } from 'vitest'
 
-describe('Connection Validation Schemas', () => {
+describe('Connection Validation Schemas - CON-01', () => {
   describe('createConnectionSchema', () => {
     test('validates correct SQL Server connection data', () => {
       const validData = {
@@ -32,6 +32,45 @@ describe('Connection Validation Schemas', () => {
       expect(() => createConnectionSchema.parse(validData)).not.toThrow()
     })
 
+    test('rejects SQL Server without database_name', () => {
+      const invalidData = {
+        conn_name: 'SQL Without DB',
+        db_type: 'sql_server' as const,
+        host: 'localhost',
+        port: 1433,
+        db_user: 'sa',
+        db_password: 'password',
+        // Sin database_name
+      }
+      expect(() => createConnectionSchema.parse(invalidData)).toThrow()
+    })
+
+    test('SQL Server requires non-empty database_name', () => {
+      const invalidData = {
+        conn_name: 'SQL Empty DB',
+        db_type: 'sql_server' as const,
+        host: 'localhost',
+        port: 1433,
+        db_user: 'sa',
+        db_password: 'password',
+        database_name: '', // Vacío
+      }
+      expect(() => createConnectionSchema.parse(invalidData)).toThrow()
+    })
+
+    test('Neo4j does not require database_name', () => {
+      const validData = {
+        conn_name: 'Neo4j No DB',
+        db_type: 'neo4j' as const,
+        host: 'localhost',
+        port: 7687,
+        db_user: 'neo4j',
+        db_password: 'password',
+        // Sin database_name - válido para Neo4j
+      }
+      expect(() => createConnectionSchema.parse(validData)).not.toThrow()
+    })
+
     test('rejects invalid connection name', () => {
       const invalidData = {
         conn_name: 'ab', // Muy corto
@@ -40,6 +79,7 @@ describe('Connection Validation Schemas', () => {
         port: 1433,
         db_user: 'sa',
         db_password: 'password',
+        database_name: 'test',
       }
       expect(() => createConnectionSchema.parse(invalidData)).toThrow()
     })
@@ -64,6 +104,7 @@ describe('Connection Validation Schemas', () => {
         port: 0, // Puerto inválido
         db_user: 'sa',
         db_password: 'password',
+        database_name: 'test',
       }
       expect(() => createConnectionSchema.parse(invalidData1)).toThrow()
 
@@ -74,6 +115,7 @@ describe('Connection Validation Schemas', () => {
         port: 70000, // Puerto muy alto
         db_user: 'sa',
         db_password: 'password',
+        database_name: 'test',
       }
       expect(() => createConnectionSchema.parse(invalidData2)).toThrow()
     })
@@ -86,6 +128,7 @@ describe('Connection Validation Schemas', () => {
         port: 1433,
         db_user: '',
         db_password: '',
+        database_name: 'test',
       }
       expect(() => createConnectionSchema.parse(invalidData)).toThrow()
     })
@@ -98,6 +141,7 @@ describe('Connection Validation Schemas', () => {
         port: 1433,
         db_user: 'sa',
         db_password: 'password',
+        database_name: 'test',
       }
       expect(() => createConnectionSchema.parse(validData)).not.toThrow()
     })
@@ -110,6 +154,7 @@ describe('Connection Validation Schemas', () => {
         port: 1433,
         db_user: 'sa',
         db_password: 'password',
+        database_name: 'test',
       }
       expect(() => createConnectionSchema.parse(invalidData)).toThrow()
     })
