@@ -182,3 +182,65 @@ export const testConnectionSchema = z.object({
     .max(100, 'El nombre de la base de datos no puede exceder 100 caracteres')
     .optional(),
 })
+
+// Schema de traducción SQL -> Cypher
+export const translateQuerySchema = z.object({
+  sql_query: z
+    .string()
+    .min(1, 'La consulta SQL no puede estar vacía')
+    .max(10000, 'La consulta SQL no puede exceder 10000 caracteres')
+    .refine(
+      (query) => {
+        // Sanitización básica: detectar caracteres peligrosos para XSS
+        const dangerousPatterns = [
+          /<script/i,
+          /<iframe/i,
+          /javascript:/i,
+          /on\w+\s*=/i, // onclick=, onload=, etc.
+          /<img[^>]+src/i,
+        ]
+        return !dangerousPatterns.some((pattern) => pattern.test(query))
+      },
+      { message: 'La consulta contiene caracteres potencialmente peligrosos' }
+    )
+    .refine(
+      (query) => {
+        // Validar que sea una consulta SQL válida (muy básica)
+        const sqlKeywords = /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\b/i
+        return sqlKeywords.test(query)
+      },
+      { message: 'No se detectó una sentencia SQL válida' }
+    )
+    .refine(
+      (query) => {
+        // Prevenir queries excesivamente complejas o sospechosas
+        const suspiciousPatterns = [
+          /;\s*(DROP|DELETE|TRUNCATE|ALTER)/i, // Múltiples comandos peligrosos
+          /UNION\s+ALL\s+SELECT/i, // SQL injection típico
+        ]
+
+        // Verificar patrones peligrosos
+        if (suspiciousPatterns.some((pattern) => pattern.test(query))) {
+          return false
+        }
+
+        // Verificar comentarios excesivos
+        const commentCount = (query.match(/--/g) || []).length
+        if (commentCount > 2) {
+          return false
+        }
+
+        return true
+      },
+      { message: 'La consulta contiene patrones sospechosos' }
+    ),
+  neo4j_connection_id: z
+    .number()
+    .int('El ID de conexión debe ser un número entero')
+    .positive('Debe seleccionar una conexión Neo4j válida'),
+})
+
+// Schema para ejecutar una query traducida
+export const executeQuerySchema = z.object({
+  query_id: z.number().int().positive(),
+})
