@@ -65,3 +65,55 @@ export interface AxiosErrorResponse {
     }
   }
 }
+
+// Tipos de Conexiones
+export type DbType = 'sql_server' | 'neo4j'
+
+export interface Connection {
+  connection_id: number
+  user_id: number
+  conn_name: string
+  db_type: DbType
+  host: string
+  port: number
+  db_user: string
+  db_password?: string // No se devuelve en GET por seguridad
+  database_name?: string // Para SQL Server
+  created_at: string
+  updated_at?: string
+  is_active?: boolean // Estado de la última prueba de conexión
+}
+
+export interface CreateConnectionRequest {
+  conn_name: string
+  db_type: DbType
+  host: string
+  port: number
+  db_user: string
+  db_password: string
+  database_name?: string // Para SQL Server
+}
+
+export interface UpdateConnectionRequest {
+  conn_name?: string
+  host?: string
+  port?: number
+  db_user?: string
+  db_password?: string // Opcional al editar
+  database_name?: string
+}
+
+export interface TestConnectionRequest {
+  db_type: DbType
+  host: string
+  port: number
+  db_user: string
+  db_password: string
+  database_name?: string
+}
+
+export interface TestConnectionResponse {
+  success: boolean
+  message: string
+  connection_time_ms?: number
+}
