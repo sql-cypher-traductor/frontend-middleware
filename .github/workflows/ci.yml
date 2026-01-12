@@ -5,7 +5,7 @@ on:
   push:
     branches: ['main', 'develop']
   pull_request:
-    branches: ['main', 'develop']
+    branches: ['develop']
 
 jobs:
   build-and-test:
@@ -35,6 +35,10 @@ jobs:
       - name: Linting (ESLint)
         run: npm run lint
 
-      # 6. Validar compilación del frontend.
+      # 6. Validar Pruebas Unitarias.
+      - name: Run Unit Tests
+        run: npm run test
+
+      # 7. Validar compilación del frontend.
       - name: Build Check
         run: npm run build
