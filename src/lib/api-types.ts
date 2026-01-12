@@ -1,18 +1,20 @@
 // Tipos de Usuario
 export interface User {
-  id: string
+  user_id: number
   email: string
-  username: string
+  name: string
+  last_name: string
   role: 'DEV' | 'ADMIN'
   is_active: boolean
   created_at: string
-  updated_at: string
+  last_login: string | null
 }
 
 // Requests de Autenticación
 export interface RegisterRequest {
   email: string
-  username: string
+  name: string
+  last_name: string
   password: string
 }
 
@@ -30,7 +32,8 @@ export interface LoginResponse {
 // Requests de Usuario
 export interface UpdateUserRequest {
   email?: string
-  username?: string
+  name?: string
+  last_name?: string
 }
 
 export interface ChangePasswordRequest {

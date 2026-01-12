@@ -10,6 +10,11 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+/**
+ * Página de perfil de usuario
+ *
+ * Muestra la información del usuario autenticado
+ */
 export default function ProfilePage() {
   const router = useRouter()
   const { user: storeUser, updateUser } = useAuthStore()
@@ -20,7 +25,8 @@ export default function ProfilePage() {
     const fetchUserProfile = async () => {
       setIsLoading(true)
       try {
-        const response = await apiClient.get<User>('/users/me')
+        // Usar endpoint correcto del backend
+        const response = await apiClient.get<User>('/auth/me')
         setUser(response.data)
         updateUser(response.data)
       } catch (error: unknown) {
@@ -46,6 +52,9 @@ export default function ProfilePage() {
     )
   }
 
+  // Nombre completo del usuario
+  const fullName = user ? `${user.name} ${user.last_name}` : 'Usuario'
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="flex justify-between items-center mb-8">
@@ -68,13 +77,26 @@ export default function ProfilePage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre de usuario
+                  Nombre completo
                 </label>
-                <p className="text-gray-900">{user?.username}</p>
+                <p className="text-gray-900">{fullName}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                  <p className="text-gray-900">{user?.name}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+                  <p className="text-gray-900">{user?.last_name}</p>
+                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Correo electrónico
+                </label>
                 <p className="text-gray-900">{user?.email}</p>
               </div>
 
@@ -87,7 +109,7 @@ export default function ProfilePage() {
                       : 'bg-blue-100 text-blue-700'
                   }`}
                 >
-                  {user?.role}
+                  {user?.role === 'ADMIN' ? 'Administrador' : 'Desarrollador'}
                 </span>
               </div>
 
@@ -119,16 +141,18 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Última actualización
+                  Último inicio de sesión
                 </label>
                 <p className="text-gray-900">
-                  {user?.updated_at
-                    ? new Date(user.updated_at).toLocaleDateString('es-ES', {
+                  {user?.last_login
+                    ? new Date(user.last_login).toLocaleDateString('es-ES', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
                       })
-                    : 'N/A'}
+                    : 'Primera sesión'}
                 </p>
               </div>
             </div>
