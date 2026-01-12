@@ -90,7 +90,7 @@ export interface CreateConnectionRequest {
   port: number
   db_user: string
   db_password: string
-  database?: string // Para SQL Server
+  database_name?: string // Para SQL Server
 }
 
 export interface UpdateConnectionRequest {
@@ -99,7 +99,7 @@ export interface UpdateConnectionRequest {
   port?: number
   db_user?: string
   db_password?: string // Opcional al editar
-  database?: string
+  database_name?: string
 }
 
 export interface TestConnectionRequest {
@@ -108,11 +108,11 @@ export interface TestConnectionRequest {
   port: number
   db_user: string
   db_password: string
-  database?: string
+  database_name?: string
 }
 
 export interface TestConnectionResponse {
   success: boolean
   message: string
-  latency_ms?: number
+  connection_time_ms?: number
 }

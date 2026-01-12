@@ -118,7 +118,23 @@ export const useConnectionStore = create<ConnectionState>((set) => ({
   testExistingConnection: async (id: number): Promise<TestConnectionResponse> => {
     set({ isLoading: true, error: null })
     try {
-      const response = await apiClient.post<TestConnectionResponse>(`/connections/${id}/test`)
+      // Get connection data first
+      const connection = get().connections.find((c) => c.connection_id === id)
+      if (!connection) {
+        throw new Error('Conexión no encontrada')
+      }
+
+      // Use the general test endpoint with connection data
+      const testData: TestConnectionRequest = {
+        db_type: connection.db_type,
+        host: connection.host,
+        port: connection.port,
+        db_user: connection.db_user,
+        db_password: '', // Password is encrypted in backend, user must provide it again for testing
+        database_name: connection.database_name,
+      }
+
+      const response = await apiClient.post<TestConnectionResponse>('/connections/test', testData)
       set({ isLoading: false })
       return response.data
     } catch (error) {

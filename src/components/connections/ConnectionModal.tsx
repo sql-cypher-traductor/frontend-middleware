@@ -29,7 +29,7 @@ interface ConnectionFormData {
   port: number
   db_user: string
   db_password: string
-  database?: string
+  database_name?: string
 }
 
 export function ConnectionModal({ isOpen, onClose, connection, onSuccess }: ConnectionModalProps) {
@@ -81,7 +81,7 @@ export function ConnectionModal({ isOpen, onClose, connection, onSuccess }: Conn
         port: 1433,
         db_user: '',
         db_password: '',
-        database: '',
+        database_name: '',
       })
       setSelectedDbType('sql_server')
     }
@@ -108,7 +108,7 @@ export function ConnectionModal({ isOpen, onClose, connection, onSuccess }: Conn
           host: data.host,
           port: data.port,
           db_user: data.db_user,
-          database: data.database,
+          database_name: data.database_name,
         }
         // Solo incluir contraseña si se proporcionó una nueva
         if (data.db_password) {
@@ -125,7 +125,7 @@ export function ConnectionModal({ isOpen, onClose, connection, onSuccess }: Conn
           port: data.port,
           db_user: data.db_user,
           db_password: data.db_password,
-          database: data.database,
+          database_name: data.database_name,
         }
         await createConnection(createData)
         toast.success('Conexión creada exitosamente')
@@ -162,12 +162,12 @@ export function ConnectionModal({ isOpen, onClose, connection, onSuccess }: Conn
         port: formData.port,
         db_user: formData.db_user,
         db_password: formData.db_password,
-        database: formData.database,
+        database_name: formData.database_name,
       })
 
       if (result.success) {
         toast.success('¡Conexión exitosa!', {
-          description: `Latencia: ${result.latency_ms}ms - ${result.message}`,
+          description: `Latencia: ${result.connection_time_ms}ms - ${result.message}`,
         })
       } else {
         toast.error('Conexión fallida', {
@@ -293,8 +293,8 @@ export function ConnectionModal({ isOpen, onClose, connection, onSuccess }: Conn
               <Input
                 label="Base de datos"
                 type="text"
-                {...register('database')}
-                error={errors.database?.message}
+                {...register('database_name')}
+                error={errors.database_name?.message}
                 placeholder="master"
                 helperText="Nombre de la base de datos a la que conectar"
               />

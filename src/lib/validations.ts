@@ -104,9 +104,9 @@ const baseConnectionSchema = z.object({
     .max(255, 'La contraseña no puede exceder 255 caracteres'),
 })
 
-// Schema para crear conexión (incluye campo database para SQL Server)
+// Schema para crear conexión (incluye campo database_name para SQL Server)
 export const createConnectionSchema = baseConnectionSchema.extend({
-  database: z
+  database_name: z
     .string()
     .max(100, 'El nombre de la base de datos no puede exceder 100 caracteres')
     .optional(),
@@ -145,7 +145,7 @@ export const updateConnectionSchema = z.object({
     .min(1, 'La contraseña es requerida')
     .max(255, 'La contraseña no puede exceder 255 caracteres')
     .optional(),
-  database: z
+  database_name: z
     .string()
     .max(100, 'El nombre de la base de datos no puede exceder 100 caracteres')
     .optional(),
@@ -177,7 +177,7 @@ export const testConnectionSchema = z.object({
     .string()
     .min(1, 'La contraseña es requerida')
     .max(255, 'La contraseña no puede exceder 255 caracteres'),
-  database: z
+  database_name: z
     .string()
     .max(100, 'El nombre de la base de datos no puede exceder 100 caracteres')
     .optional(),

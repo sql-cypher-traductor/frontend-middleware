@@ -26,7 +26,7 @@ export function ConnectionCard({ connection, onEdit, onDelete }: ConnectionCardP
       const result = await testExistingConnection(connection.connection_id)
       if (result.success) {
         toast.success('Conexión exitosa', {
-          description: `Latencia: ${result.latency_ms}ms`,
+          description: `Latencia: ${result.connection_time_ms}ms`,
         })
       } else {
         toast.error('Conexión fallida', {
