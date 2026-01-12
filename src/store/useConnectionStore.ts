@@ -119,7 +119,9 @@ export const useConnectionStore = create<ConnectionState>((set) => ({
     set({ isLoading: true, error: null })
     try {
       // Get connection data first
-      const connection = useConnectionStore.getState().connections.find((c) => c.connection_id === id)
+      const connection = useConnectionStore
+        .getState()
+        .connections.find((c) => c.connection_id === id)
       if (!connection) {
         throw new Error('Conexión no encontrada')
       }
