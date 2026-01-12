@@ -117,3 +117,53 @@ export interface TestConnectionResponse {
   message: string
   connection_time_ms?: number
 }
+
+// Tipos de Traducción SQL -> Cypher
+export type QueryStatus = 'traducido' | 'ejecutado' | 'fallido'
+
+export interface TranslateRequest {
+  sql_query: string
+  neo4j_connection_id: number // Conexión Neo4j donde se ejecutará
+}
+
+export interface TranslateResponse {
+  query_id: number
+  cypher_query: string
+  status: QueryStatus
+  traduction_time: number // Tiempo de traducción en ms
+  error_message?: string
+  metadata?: {
+    query_type: string // 'SELECT', 'INSERT', 'UPDATE', etc.
+    tables_detected: string[]
+    complexity_score?: number
+  }
+  warnings?: string[]
+}
+
+export interface QueryHistory {
+  query_id: number
+  user_id: number
+  neo4j_connection_id: number
+  sql_query: string
+  cypher_query: string
+  status: QueryStatus
+  error_message?: string
+  traduction_time: number // En ms
+  execution_time?: number // En ms (opcional si no se ejecutó)
+  nodes_affected?: number // Nodos afectados en la ejecución
+  created_at: string
+}
+
+// Para actualizar el estado después de ejecutar
+export interface ExecuteQueryRequest {
+  query_id: number
+}
+
+export interface ExecuteQueryResponse {
+  query_id: number
+  status: QueryStatus
+  execution_time: number // En ms
+  nodes_affected: number
+  results?: unknown[] // Resultados de la ejecución
+  error_message?: string
+}
