@@ -1,6 +1,6 @@
 name: Frontend CI
 
-# Se ejecuta cuando haces push o PR a main/develop
+# Configuración de ramas de ejecución
 on:
   push:
     branches: ['main', 'develop']
@@ -16,26 +16,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Instalar Node.js (Versión 18 o 20, la que uses)
+      # 2. Instalar Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22.21'
-          cache: 'npm' # Esto hace que npm install sea rapidísimo la próxima vez
+          cache: 'npm'
 
-      # 3. Instalar dependencias (npm ci es más seguro que npm install para CI)
+      # 3. Instalar dependencias para CI
       - name: Install dependencies
         run: npm ci
 
-      # 4. Verificar formato (Prettier)
-      # Si alguien sube código desordenado, esto falla.
+      # 4. Validar formato de código.
       - name: Check Formatting (Prettier)
         run: npx prettier --check .
 
-      # 5. Verificar calidad de código (ESLint)
+      # 5. Validar calidad de código.
       - name: Linting (ESLint)
         run: npm run lint
 
-      # 6. Verificar compilación (Build)
+      # 6. Validar compilación del frontend.
       - name: Build Check
         run: npm run build
