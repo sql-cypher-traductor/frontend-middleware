@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import type { AxiosErrorResponse, UpdateUserRequest } from '@/lib/api-types'
+import type { AxiosErrorResponse, UpdateUserRequest, User } from '@/lib/api-types'
 import { apiClient } from '@/lib/axios'
 import { updateProfileSchema } from '@/lib/validations'
 import { useAuthStore } from '@/store/useAuthStore'
@@ -16,6 +16,11 @@ import { z } from 'zod'
 
 type UpdateProfileFormData = z.infer<typeof updateProfileSchema>
 
+/**
+ * Página de edición de perfil
+ *
+ * Permite al usuario actualizar su nombre, apellido y email
+ */
 export default function EditProfilePage() {
   const router = useRouter()
   const { user, updateUser } = useAuthStore()
@@ -28,8 +33,9 @@ export default function EditProfilePage() {
   } = useForm<UpdateProfileFormData>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
+      name: user?.name || '',
+      last_name: user?.last_name || '',
       email: user?.email || '',
-      username: user?.username || '',
     },
   })
 
@@ -37,11 +43,12 @@ export default function EditProfilePage() {
     setIsLoading(true)
     try {
       const payload: UpdateUserRequest = {
-        email: data.email,
-        username: data.username,
+        name: data.name.trim(),
+        last_name: data.last_name.trim(),
+        email: data.email.toLowerCase().trim(),
       }
 
-      const response = await apiClient.put('/users/me', payload)
+      const response = await apiClient.put<User>('/auth/me', payload)
 
       updateUser(response.data)
 
@@ -79,28 +86,40 @@ export default function EditProfilePage() {
           <CardDescription>Modifica los campos que desees actualizar</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
             <Input
-              label="Email"
+              label="Nombre"
+              type="text"
+              placeholder="Juan"
+              autoComplete="given-name"
+              error={errors.name?.message}
+              {...register('name')}
+              required
+            />
+
+            <Input
+              label="Apellido"
+              type="text"
+              placeholder="Pérez"
+              autoComplete="family-name"
+              error={errors.last_name?.message}
+              {...register('last_name')}
+              required
+            />
+
+            <Input
+              label="Correo electrónico"
               type="email"
               placeholder="tu@email.com"
+              autoComplete="email"
               error={errors.email?.message}
               {...register('email')}
               required
             />
 
-            <Input
-              label="Nombre de usuario"
-              type="text"
-              placeholder="usuario123"
-              error={errors.username?.message}
-              {...register('username')}
-              required
-            />
-
             <div className="flex gap-3 pt-4">
               <Button type="submit" isLoading={isLoading} disabled={isLoading}>
-                Guardar cambios
+                {isLoading ? 'Guardando...' : 'Guardar cambios'}
               </Button>
               <Button
                 type="button"
