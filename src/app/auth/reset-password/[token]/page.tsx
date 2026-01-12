@@ -3,51 +3,59 @@
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import type { AxiosErrorResponse, RegisterRequest } from '@/lib/api-types'
+import type { AxiosErrorResponse, PasswordResetConfirm } from '@/lib/api-types'
 import { apiClient } from '@/lib/axios'
-import { registerSchema } from '@/lib/validations'
+import { resetPasswordSchema } from '@/lib/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-type RegisterFormData = z.infer<typeof registerSchema>
+type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
 
-export default function RegisterPage() {
+export default function ResetPasswordPage() {
   const router = useRouter()
+  const params = useParams()
+  const token = params.token as string
   const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
   })
 
-  const onSubmit = async (data: RegisterFormData) => {
+  const onSubmit = async (data: ResetPasswordFormData) => {
+    if (!token) {
+      toast.error('Error', {
+        description: 'Token de restablecimiento no válido',
+      })
+      return
+    }
+
     setIsLoading(true)
     try {
-      const payload: RegisterRequest = {
-        email: data.email,
-        username: data.username,
-        password: data.password,
+      const payload: PasswordResetConfirm = {
+        token: token,
+        new_password: data.password,
       }
 
-      await apiClient.post('/auth/register', payload)
+      await apiClient.post('/auth/password-reset/confirm', payload)
 
-      toast.success('¡Registro exitoso!', {
-        description: 'Tu cuenta ha sido creada. Por favor inicia sesión.',
+      toast.success('¡Contraseña restablecida!', {
+        description: 'Tu contraseña ha sido cambiada exitosamente. Ahora puedes iniciar sesión.',
       })
 
       router.push('/auth/login')
     } catch (error: unknown) {
       const message =
-        (error as AxiosErrorResponse).response?.data?.detail || 'Error al registrar usuario'
-      toast.error('Error de registro', {
+        (error as AxiosErrorResponse).response?.data?.detail || 'Error al restablecer contraseña'
+      toast.error('Error', {
         description: message,
       })
     } finally {
@@ -65,32 +73,14 @@ export default function RegisterPage() {
 
         <Card variant="elevated">
           <CardHeader>
-            <CardTitle>Crear cuenta</CardTitle>
-            <CardDescription>Ingresa tus datos para registrarte</CardDescription>
+            <CardTitle>Restablecer contraseña</CardTitle>
+            <CardDescription>Ingresa tu nueva contraseña</CardDescription>
           </CardHeader>
 
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <Input
-                label="Email"
-                type="email"
-                placeholder="tu@email.com"
-                error={errors.email?.message}
-                {...register('email')}
-                required
-              />
-
-              <Input
-                label="Nombre de usuario"
-                type="text"
-                placeholder="usuario123"
-                error={errors.username?.message}
-                {...register('username')}
-                required
-              />
-
-              <Input
-                label="Contraseña"
+                label="Nueva contraseña"
                 type="password"
                 placeholder="••••••••"
                 error={errors.password?.message}
@@ -109,17 +99,17 @@ export default function RegisterPage() {
               />
 
               <Button type="submit" className="w-full" isLoading={isLoading} disabled={isLoading}>
-                Registrarse
+                Restablecer contraseña
               </Button>
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                ¿Ya tienes cuenta?{' '}
-                <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
-                  Inicia sesión
-                </Link>
-              </p>
+              <Link
+                href="/auth/login"
+                className="text-sm font-medium text-blue-600 hover:text-blue-500"
+              >
+                ← Volver al inicio de sesión
+              </Link>
             </div>
           </CardContent>
         </Card>
