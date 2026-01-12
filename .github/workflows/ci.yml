@@ -37,6 +37,5 @@ jobs:
         run: npm run lint
 
       # 6. Verificar compilación (Build)
-      # CRÍTICO: Next.js a veces pasa el lint pero falla al compilar tipos.
       - name: Build Check
         run: npm run build
